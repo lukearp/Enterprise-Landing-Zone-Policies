@@ -55,44 +55,25 @@
                                 "contentVersion": "1.0.0.0",
                                 "parameters": {
                                     "vnetName": {
-                                        "type": "string",
-                                        "defaultValue": "testSpokeVnet"
+                                        "type": "string"
                                     },
                                     "resourceGroupName": {
-                                        "type": "string",
-                                        "defaultValue": "Spoke-Test"
+                                        "type": "string"
                                     },
                                     "vnetAddressSpace": {
-                                        "type": "string",
-                                        "defaultValue": "10.0.4.0/22"
+                                        "type": "string"
                                     },
                                     "dnsServers": {
-                                        "type": "array",
-                                        "defaultValue": [
-                                            "10.1.1.5",
-                                            "10.1.1.9"
-                                        ]
+                                        "type": "array"
                                     },
                                     "subnets": {
-                                        "type": "array",
-                                        "defaultValue": [
-                                            {
-                                                "name": "testSpokeSub",
-                                                "addressPrefix": "10.0.4.0/24"
-                                            },
-                                            {
-                                                "name": "testSpokeSub2",
-                                                "addressPrefix": "10.0.5.0/24"
-                                            }
-                                        ]
+                                        "type": "array"
                                     },
                                     "hubVnetId": {
-                                        "type": "string",
-                                        "defaultValue": "/subscriptions/2ab6855d-b9f8-4762-bba5-efe49f339629/resourceGroups/Policy-Tset/providers/Microsoft.Network/virtualNetworks/testVnet"
+                                        "type": "string"
                                     },
                                     "location": {
-                                        "type": "string",
-                                        "defaultValue": "eastus"
+                                        "type": "string"
                                     }
                                 },
                                 "variables": {
