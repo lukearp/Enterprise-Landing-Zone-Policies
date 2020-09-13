@@ -557,7 +557,10 @@
                                                                 "remoteVirtualNetwork": {
                                                                     "id": "[parameters('hubVnetId')]"
                                                                 }
-                                                            }
+                                                            },
+                                                            "dependsOn": [
+                                                                "[parameters('vnetName')]"
+                                                            ]
                                                         },
                                                         {
                                                             "type": "Microsoft.Resources/deployments",
