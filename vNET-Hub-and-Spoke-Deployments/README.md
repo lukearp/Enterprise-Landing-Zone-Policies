@@ -158,10 +158,14 @@ $location = "eastus"
 New-AzManagementGroupDeployment -Name Hub-and-Spoke -ManagementGroupId $managementGroupId -Location $location -TemplateFile .\ARM-ManagementGroup-DeployPolicyDefs-vNET-Hub-and-Spoke.json -TemplateParameterFile .\ARM-ManagementGroup-DeployPolicyDefs-vNET-Hub-and-Spoke-Parameters.json
 ```
 
-# How to support multiple subscription deployments
+# How to support multiple subscription deployments?
 
 The Rememdiation task has to have rights to the HUB VNET.  When a Policy is assigned there is a Remediation Principal ID.  This is an Object ID of a Service principal.  This Object ID needs to be given rights to the Resource Group that has your HUB VNET.  This can easily be done using Cloud Shell:
 
 ```
 New-AzRoleAssignment -ObjectId <Assignment Principal ID> -ResourceGroupName <resource group of hub vnet> -RoleDefinitionName "Contributor"
 ```
+
+# What are some Features that are planned in the future?
+
+I am planning on adding the ability to deploy an Azure Firewall in the HUB.  I will also be adding the option for deploying an Azure Bastion Host.  If there are any features that are wanted, submit an issue.  
