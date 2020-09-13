@@ -1,0 +1,662 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "input1":{
+        "value": {
+            "mode": "All",
+            "policyType": "Custom",
+            "displayName": "Deploy-vNET-Hub",
+            "description": "Deploy VNET Hub with Gateway",
+            "metadata": {
+                "category": "Enterprise Landing Zone"
+            },
+            "policyRule": {
+                "if": {
+                    "field": "type",
+                    "equals": "Microsoft.Resources/subscriptions"
+                },
+                "then": {
+                    "effect": "deployIfNotExists",
+                    "details": {
+                        "type": "Microsoft.Network/virtualNetworks",
+                        "name": "[parameters('vnetName')]",
+                        "ResourceGroupName": "[parameters('resourceGroupName')]",
+                        "roleDefinitionIds": [
+                            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+                        ],
+                        "existenceScope": "ResourceGroup",
+                        "deploymentScope": "Subscription",
+                        "deployment": {
+                            "location": "eastus",
+                            "properties": {
+                                "mode": "incremental",
+                                "parameters": {
+                                    "vnetName": {
+                                        "value": "[parameters('vnetName')]"
+                                    },
+                                    "resourceGroupName": {
+                                        "value": "[parameters('resourceGroupName')]"
+                                    },
+                                    "vnetAddressSpace": {
+                                        "value": "[parameters('vnetAddressSpace')]"
+                                    },
+                                    "dnsServers": {
+                                        "value": "[parameters('dnsServers')]"
+                                    },
+                                    "gatewaySubnetAddressPrefix": {
+                                        "value": "[parameters('gatewaySubnetAddressPrefix')]"
+                                    },
+                                    "subnets": {
+                                        "value": "[parameters('subnets')]"
+                                    },
+                                    "gatewayType": {
+                                        "value": "[parameters('gatewayType')]"
+                                    },
+                                    "gatewaySku": {
+                                        "value": "[parameters('gatewaySku')]"
+                                    },
+                                    "location": {
+                                        "value": "[parameters('location')]"
+                                    }
+                                },
+                                "template": {
+                                    "$schema": "http://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json",
+                                    "contentVersion": "1.0.0.0",
+                                    "parameters": {
+                                        "vnetName": {
+                                            "type": "string"
+                                        },
+                                        "resourceGroupName": {
+                                            "type": "string"
+                                        },
+                                        "vnetAddressSpace": {
+                                            "type": "string"
+                                        },
+                                        "dnsServers": {
+                                            "type": "array"
+                                        },
+                                        "gatewaySubnetAddressPrefix": {
+                                            "type": "string"
+                                        },
+                                        "subnets": {
+                                            "type": "array"
+                                        },
+                                        "gatewayType": {
+                                            "type": "string",
+                                            "allowedValues": [
+                                                "VPN",
+                                                "ExpressRoute"
+                                            ]
+                                        },
+                                        "gatewaySku": {
+                                            "type": "string"
+                                        },
+                                        "location": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "variables": {
+                                        "subnets": {
+                                            "copy": [
+                                                {
+                                                    "name": "subnetArray",
+                                                    "count": "[length(parameters('subnets'))]",
+                                                    "input": {
+                                                        "name": "[parameters('subnets')[copyIndex('subnetArray')].name]",
+                                                        "properties": {
+                                                            "addressPrefix": "[parameters('subnets')[copyIndex('subnetArray')].addressPrefix]",
+                                                            "networkSecurityGroup": {
+                                                                "id": "[concat(subscription().id,'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Network/networkSecurityGroups/NSG_',parameters('subnets')[copyIndex('subnetArray')].name,'_',parameters('location'))]"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        "GatewaySubnet": {
+                                            "name": "GatewaySubnet",
+                                            "properties": {
+                                                "addressPrefix": "[parameters('gatewaySubnetAddressPrefix')]"
+                                            }
+                                        },
+                                        "finalSubnetArray": "[concat(variables('subnets').subnetArray,array(variables('GatewaySubnet')))]",
+                                        "vpnGatewayProperties": {
+                                            "ipConfigurations": [
+                                                {
+                                                    "properties": {
+                                                        "privateIPAllocationMethod": "Dynamic",
+                                                        "subnet": {
+                                                            "id": "[concat(subscription().id,'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Network/virtualNetworks/',parameters('vnetName'),'/subnets/GatewaySubnet')]"
+                                                        },
+                                                        "publicIPAddress": {
+                                                            "id": "[concat(subscription().id,'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Network/publicIPAddresses/',concat(parameters('location'),'-gw-pip'))]"
+                                                        }
+                                                    },
+                                                    "name": "ipConfig"
+                                                }
+                                            ],
+                                            "gatewayType": "VPN",
+                                            "vpnType": "RouteBased",
+                                            "sku": {
+                                                "name": "[parameters('gatewaySku')]",
+                                                "tier": "[parameters('gatewaySku')]"
+                                            }
+                                        },
+                                        "erGatewayProperties": {
+                                            "ipConfigurations": [
+                                                {
+                                                    "properties": {
+                                                        "privateIPAllocationMethod": "Dynamic",
+                                                        "subnet": {
+                                                            "id": "[concat(subscription().id,'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Network/virtualNetworks/',parameters('vnetName'),'/subnets/GatewaySubnet')]"
+                                                        },
+                                                        "publicIPAddress": {
+                                                            "id": "[concat(subscription().id,'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Network/publicIPAddresses/',concat(parameters('location'),'-gw-pip'))]"
+                                                        }
+                                                    },
+                                                    "name": "ipConfig"
+                                                }
+                                            ],
+                                            "gatewayType": "ExpressRoute",
+                                            "sku": {
+                                                "name": "[parameters('gatewaySku')]",
+                                                "tier": "[parameters('gatewaySku')]"
+                                            }
+                                        }
+                                    },
+                                    "resources": [
+                                        {
+                                            "type": "Microsoft.Resources/resourceGroups",
+                                            "apiVersion": "2018-05-01",
+                                            "name": "[parameters('resourceGroupName')]",
+                                            "location": "[parameters('location')]",
+                                            "properties": {}
+                                        },
+                                        {
+                                            "type": "Microsoft.Resources/deployments",
+                                            "apiVersion": "2018-05-01",
+                                            "name": "[concat(parameters('vnetName'),'-',parameters('location'),'-nsg-',copyIndex())]",
+                                            "resourceGroup": "[parameters('resourceGroupName')]",
+                                            "dependsOn": [
+                                                "[parameters('resourceGroupName')]"
+                                            ],
+                                            "copy": {
+                                                "name": "iterator",
+                                                "count": "[length(parameters('subnets'))]"
+                                            },
+                                            "properties": {
+                                                "mode": "incremental",
+                                                "template": {
+                                                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                                                    "contentVersion": "1.0.0.0",
+                                                    "parameters": {},
+                                                    "variables": {},
+                                                    "resources": [
+                                                        {
+                                                            "name": "[concat('NSG_',parameters('subnets')[copyIndex()].name,'_',parameters('location'))]",
+                                                            "type": "Microsoft.Network/networkSecurityGroups",
+                                                            "apiVersion": "2020-05-01",
+                                                            "location": "[parameters('location')]",
+                                                            "properties": {
+                                                                "securityRules": []
+                                                            }
+                                                        }
+                                                    ],
+                                                    "outputs": {
+                                                        "nsgResourceId": {
+                                                            "type": "string",
+                                                            "value": "[resourceId('Microsoft.Network/networkSecurityGroups',concat('NSG_',parameters('subnets')[copyIndex()].name))]"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "type": "Microsoft.Resources/deployments",
+                                            "apiVersion": "2018-05-01",
+                                            "name": "[concat(parameters('vnetName'),'-',parameters('location'))]",
+                                            "resourceGroup": "[parameters('resourceGroupName')]",
+                                            "dependsOn": [
+                                                "[concat(parameters('vnetName'),'-',parameters('location'),'-nsg-',sub(length(parameters('subnets')),1))]"
+                                            ],
+                                            "properties": {
+                                                "mode": "incremental",
+                                                "template": {
+                                                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                                                    "contentVersion": "1.0.0.0",
+                                                    "parameters": {},
+                                                    "variables": {
+                                                    },
+                                                    "resources": [
+                                                        {
+                                                            "type": "Microsoft.Network/virtualNetworks",
+                                                            "name": "[parameters('vnetName')]",
+                                                            "apiVersion": "2020-05-01",
+                                                            "location": "[parameters('location')]",
+                                                            "properties": {
+                                                                "addressSpace": {
+                                                                    "addressPrefixes": [
+                                                                        "[parameters('vnetAddressSpace')]"
+                                                                    ]
+                                                                },
+                                                                "dhcpOptions": {
+                                                                    "dnsServers": "[parameters('dnsServers')]"
+                                                                },
+                                                                "subnets": "[variables('finalSubnetArray')]"
+                                                            }
+                                                        },
+                                                        {
+                                                            "name": "[concat(parameters('location'),'-gw')]",
+                                                            "type": "Microsoft.Network/virtualNetworkGateways",
+                                                            "apiVersion": "2020-05-01",
+                                                            "location": "[parameters('location')]",
+                                                            "dependsOn": [
+                                                                "[parameters('vnetName')]",
+                                                                "[concat(parameters('location'),'-gw-pip')]"
+                                                            ],
+                                                            "properties": "[if(equals(parameters('gatewayType'),'VPN'),variables('vpnGatewayProperties'),variables('erGatewayProperties'))]"
+                                                        },
+                                                        {
+                                                            "name": "[concat(parameters('location'),'-gw-pip')]",
+                                                            "type": "Microsoft.Network/publicIPAddresses",
+                                                            "apiVersion": "2020-05-01",
+                                                            "location": "[parameters('location')]",
+                                                            "sku": {
+                                                                "name": "basic"
+                                                            },
+                                                            "properties": {
+                                                                "publicIPAllocationMethod": "Dynamic"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "parameters": {
+                "vnetName": {
+                    "type": "String",
+                    "metadata": {
+                        "description": "The VNET name of your Spoke"
+                    }
+                },
+                "resourceGroupName": {
+                    "type": "String",
+                    "metadata": {
+                        "description": "The Resource Group Name that the Spoke VNET will be deployed to."
+                    }
+                },
+                "vnetAddressSpace": {
+                    "type": "String",
+                    "metadata": {
+                        "description": "The IPv4 Address Space for the Spoke VNET. Ex: \"10.10.0.0/22\""
+                    }
+                },
+                "dnsServers": {
+                    "type": "Array",
+                    "defaultValue": [],
+                    "metadata": {
+                        "description": "Arrary of DNS Service IPs if wanting to use Custom DNS.  Ex: [\"10.10.1.1\",\"10.10.1.2\"]"
+                    }
+                },
+                "gatewaySubnetAddressPrefix": {
+                    "type": "String",
+                    "metadata": {
+                        "description": "Subnet address space for the VPN/Express Route Gateway. Ex: \"10.0.3.224/27\""
+                    }
+                },
+                "subnets": {
+                    "type": "Array",
+                    "metadata": {
+                        "description": "Names and address spaces of your Subnets.  Objects need a Name and Address Preffix property Ex: [{\"name\": \"subnet1\",\"addressPrefix\":\"10.10.0.0/24\"},{\"name\": \"subnet2\",\"addressPrefix\":\"10.10.1.0/24\"}]"
+                    },
+                    "defaultValue": []
+                },
+                "gatewayType": {
+                    "type": "String",
+                    "allowedValues": [
+                        "VPN",
+                        "ExpressRoute"
+                    ],
+                    "defaultValue": "VPN",
+                    "metadata": {
+                        "description": "Azure Gateway type. VPN or ExpressRoute"
+                    }
+                },
+                "gatewaySku": {
+                    "type": "String",
+                    "allowedValues": [
+                        "Basic", "HighPerformance", "Standard", "UltraPerformance", "VpnGw1", "VpnGw2", "VpnGw3", "VpnGw4", "VpnGw5"
+                    ],
+                    "defaultValue": "Basic",
+                    "metadata": {
+                        "description": "Azure Gateway Sku. Currently, this template does not support Availability Zone Gateway SKUs"
+                    }
+                },
+                "location": {
+                    "type": "String",
+                    "metadata": {
+                        "description": "Azure Region that VNET will be deployed to. Ex: eastus"
+                    }
+                }
+            }
+        }
+    },
+    "input2":{
+        "value": {
+            "mode": "All",
+            "policyType": "Custom",
+            "displayName": "Deploy-vNET-Spoke",
+            "description": "Deploy VNET Spoke with HUB peering",
+            "metadata": {
+                "category": "Enterprise Landing Zone"
+            },
+            "policyRule": {
+                "if": {
+                    "field": "type",
+                    "equals": "Microsoft.Resources/subscriptions"
+                },
+                "then": {
+                    "effect": "deployIfNotExists",
+                    "details": {
+                        "type": "Microsoft.Network/virtualNetworks",
+                        "name": "[parameters('vnetName')]",
+                        "ResourceGroupName": "[parameters('resourceGroupName')]",
+                        "roleDefinitionIds": [
+                            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+                        ],
+                        "existenceScope": "ResourceGroup",
+                        "deploymentScope": "Subscription",
+                        "deployment": {
+                            "location": "eastus",
+                            "properties": {
+                                "mode": "incremental",
+                                "parameters": {
+                                    "vnetName": {
+                                        "value": "[parameters('vnetName')]"
+                                    },
+                                    "resourceGroupName": {
+                                        "value": "[parameters('resourceGroupName')]"
+                                    },
+                                    "vnetAddressSpace": {
+                                        "value": "[parameters('vnetAddressSpace')]"
+                                    },
+                                    "dnsServers": {
+                                        "value": "[parameters('dnsServers')]"
+                                    },
+                                    "subnets": {
+                                        "value": "[parameters('subnets')]"
+                                    },
+                                    "hubVnetId": {
+                                        "value": "[parameters('hubVnetId')]"
+                                    },
+                                    "location": {
+                                        "value": "[parameters('location')]"
+                                    }
+                                },
+                                "template": {
+                                    "$schema": "http://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json",
+                                    "contentVersion": "1.0.0.0",
+                                    "parameters": {
+                                        "vnetName": {
+                                            "type": "string",
+                                            "defaultValue": "testSpokeVnet"
+                                        },
+                                        "resourceGroupName": {
+                                            "type": "string",
+                                            "defaultValue": "Spoke-Test"
+                                        },
+                                        "vnetAddressSpace": {
+                                            "type": "string",
+                                            "defaultValue": "10.0.4.0/22"
+                                        },
+                                        "dnsServers": {
+                                            "type": "array",
+                                            "defaultValue": [
+                                                "10.1.1.5",
+                                                "10.1.1.9"
+                                            ]
+                                        },
+                                        "subnets": {
+                                            "type": "array",
+                                            "defaultValue": [
+                                                {
+                                                    "name": "testSpokeSub",
+                                                    "addressPrefix": "10.0.4.0/24"
+                                                },
+                                                {
+                                                    "name": "testSpokeSub2",
+                                                    "addressPrefix": "10.0.5.0/24"
+                                                }
+                                            ]
+                                        },
+                                        "hubVnetId": {
+                                            "type": "string",
+                                            "defaultValue": "/subscriptions/2ab6855d-b9f8-4762-bba5-efe49f339629/resourceGroups/Policy-Tset/providers/Microsoft.Network/virtualNetworks/testVnet"
+                                        },
+                                        "location": {
+                                            "type": "string",
+                                            "defaultValue": "eastus"
+                                        }
+                                    },
+                                    "variables": {
+                                        "subnets": {
+                                            "copy": [
+                                                {
+                                                    "name": "subnetArray",
+                                                    "count": "[length(parameters('subnets'))]",
+                                                    "input": {
+                                                        "name": "[parameters('subnets')[copyIndex('subnetArray')].name]",
+                                                        "properties": {
+                                                            "addressPrefix": "[parameters('subnets')[copyIndex('subnetArray')].addressPrefix]",
+                                                            "networkSecurityGroup": {
+                                                                "id": "[concat(subscription().id,'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Network/networkSecurityGroups/NSG_',parameters('subnets')[copyIndex('subnetArray')].name,'_',parameters('location'))]"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        "subscriptionId": "[subscription().id]"
+                                    },
+                                    "resources": [
+                                        {
+                                            "type": "Microsoft.Resources/resourceGroups",
+                                            "apiVersion": "2018-05-01",
+                                            "name": "[parameters('resourceGroupName')]",
+                                            "location": "[parameters('location')]",
+                                            "properties": {}
+                                        },
+                                        {
+                                            "type": "Microsoft.Resources/deployments",
+                                            "apiVersion": "2018-05-01",
+                                            "name": "[concat(parameters('vnetName'),'-',parameters('location'),'-nsg-',copyIndex())]",
+                                            "resourceGroup": "[parameters('resourceGroupName')]",
+                                            "dependsOn": [
+                                                "[parameters('resourceGroupName')]"
+                                            ],
+                                            "copy": {
+                                                "name": "iterator",
+                                                "count": "[length(parameters('subnets'))]"
+                                            },
+                                            "properties": {
+                                                "mode": "incremental",
+                                                "template": {
+                                                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                                                    "contentVersion": "1.0.0.0",
+                                                    "parameters": {},
+                                                    "variables": {},
+                                                    "resources": [
+                                                        {
+                                                            "name": "[concat('NSG_',parameters('subnets')[copyIndex()].name,'_',parameters('location'))]",
+                                                            "type": "Microsoft.Network/networkSecurityGroups",
+                                                            "apiVersion": "2020-05-01",
+                                                            "location": "[parameters('location')]",
+                                                            "properties": {
+                                                                "securityRules": []
+                                                            }
+                                                        }
+                                                    ],
+                                                    "outputs": {
+                                                        "nsgResourceId": {
+                                                            "type": "string",
+                                                            "value": "[resourceId('Microsoft.Network/networkSecurityGroups',concat('NSG_',parameters('subnets')[copyIndex()].name))]"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "type": "Microsoft.Resources/deployments",
+                                            "apiVersion": "2018-05-01",
+                                            "name": "[concat(parameters('vnetName'),'-',parameters('location'))]",
+                                            "resourceGroup": "[parameters('resourceGroupName')]",
+                                            "dependsOn": [
+                                                "[concat(parameters('vnetName'),'-',parameters('location'),'-nsg-',sub(length(parameters('subnets')),1))]"
+                                            ],
+                                            "properties": {
+                                                "mode": "incremental",
+                                                "template": {
+                                                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                                                    "contentVersion": "1.0.0.0",
+                                                    "parameters": {},
+                                                    "variables": {},
+                                                    "resources": [
+                                                        {
+                                                            "type": "Microsoft.Network/virtualNetworks",
+                                                            "name": "[parameters('vnetName')]",
+                                                            "apiVersion": "2020-05-01",
+                                                            "location": "[parameters('location')]",
+                                                            "properties": {
+                                                                "addressSpace": {
+                                                                    "addressPrefixes": [
+                                                                        "[parameters('vnetAddressSpace')]"
+                                                                    ]
+                                                                },
+                                                                "dhcpOptions": {
+                                                                    "dnsServers": "[parameters('dnsServers')]"
+                                                                },
+                                                                "subnets": "[variables('subnets').subnetArray]"
+                                                            }
+                                                        },
+                                                        {
+                                                            "name": "[concat(parameters('vnetName'),'/To-HUB')]",
+                                                            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+                                                            "apiVersion": "2020-05-01",
+                                                            "properties": {
+                                                                "allowVirtualNetworkAccess": true,
+                                                                "allowForwardedTraffic": true,
+                                                                "useRemoteGateways": true,
+                                                                "remoteVirtualNetwork": {
+                                                                    "id": "[parameters('hubVnetId')]"
+                                                                }
+                                                            }
+                                                        },
+                                                        {
+                                                            "type": "Microsoft.Resources/deployments",
+                                                            "apiVersion": "2018-05-01",
+                                                            "name": "[concat(parameters('vnetName'),'-',parameters('location'),'-HubPeer')]",
+                                                            "resourceGroup": "[split(parameters('hubVnetId'),'/')[4]]",
+                                                            "subscriptionId": "[split(parameters('hubVnetId'),'/')[2]]",
+                                                            "dependsOn": [
+                                                                "[parameters('vnetName')]"
+                                                            ],
+                                                            "properties": {
+                                                                "mode": "incremental",
+                                                                "template": {
+                                                                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                                                                    "contentVersion": "1.0.0.0",
+                                                                    "parameters": {},
+                                                                    "variables": {},
+                                                                    "resources": [
+                                                                        {
+                                                                            "name": "[concat(split(parameters('hubVnetId'),'/')[8],'/To-',parameters('vnetName'))]",
+                                                                            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+                                                                            "apiVersion": "2020-05-01",
+                                                                            "properties": {
+                                                                                "allowVirtualNetworkAccess": true,
+                                                                                "allowForwardedTraffic": false,
+                                                                                "allowGatewayTransit": true,
+                                                                                "remoteVirtualNetwork": {
+                                                                                    "id": "[concat(variables('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Network/virtualNetworks/',parameters('vnetName'))]"
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        }
+                                                    ],
+                                                    "outputs": {
+                                                        "vnetId": {
+                                                            "type": "string",
+                                                            "value": "[concat(subscription().id,'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Network/virtualNetworks/',parameters('vnetName'))]"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "parameters": {
+                "vnetName": {
+                    "type": "String",
+                    "metadata": {
+                        "description": "The VNET name of your Spoke"
+                    }
+                },
+                "resourceGroupName": {
+                    "type": "String",
+                    "metadata": {
+                        "description": "The Resource Group Name that the Spoke VNET will be deployed to."
+                    }
+                },
+                "vnetAddressSpace": {
+                    "type": "String",
+                    "metadata": {
+                        "description": "The IPv4 Address Space for the Spoke VNET. Ex: \"10.10.0.0/22\""
+                    }
+                },
+                "dnsServers": {
+                    "type": "Array",
+                    "defaultValue": [],
+                    "metadata": {
+                        "description": "Arrary of DNS Service IPs if wanting to use Custom DNS.  Ex: [\"10.10.1.1\",\"10.10.1.2\"]"
+                    }
+                },
+                "subnets": {
+                    "type": "Array",
+                    "metadata": {
+                        "description": "Names and address spaces of your Subnets.  Objects need a Name and Address Preffix property Ex: [{\"name\": \"subnet1\",\"addressPrefix\":\"10.10.0.0/24\"},{\"name\": \"subnet2\",\"addressPrefix\":\"10.10.1.0/24\"}]"
+                    },
+                    "defaultValue": []
+                },
+                "hubVnetId": {
+                    "type": "String",
+                    "metadata": {
+                        "description": "Resource ID of the HUB VNET that the Spoke will be peered to. Ex: /subscriptions/<subId>/resourceGroups/Policy-Tset/providers/Microsoft.Network/virtualNetworks/<vnet name>"
+                    }
+                },
+                "location": {
+                    "type": "String",
+                    "metadata": {
+                        "description": "Azure Region that VNET will be deployed to. Ex: eastus"
+                    }
+                }
+            }
+        }
+    }
+  }
+}

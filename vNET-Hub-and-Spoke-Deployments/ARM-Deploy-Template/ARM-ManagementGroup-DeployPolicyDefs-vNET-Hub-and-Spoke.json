@@ -1,0 +1,28 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-08-01/managementGroupDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "input1": {
+            "type": "object"
+        },
+        "input2": {
+            "type": "object"
+        }
+    },
+    "variables": {
+    },
+    "resources": [
+        {
+            "name": "Deploy-vNET-Hub",
+            "type": "Microsoft.Authorization/policyDefinitions",
+            "apiVersion": "2019-09-01",
+            "properties": "[parameters('input1')]"
+        },
+        {
+            "name": "Deploy-vNET-Spoke",
+            "type": "Microsoft.Authorization/policyDefinitions",
+            "apiVersion": "2019-09-01",
+            "properties": "[parameters('input2')]"
+        }
+    ]
+}
