@@ -1,5 +1,28 @@
 # Policies
 
+# How to use these Policies?
+
+The files Deploy-vNet-Hub.json and Deploy-vNET-Spoke.json can be the body in a PUT REST call: https://docs.microsoft.com/en-us/rest/api/resources/policydefinitions/createorupdate.  Once the Policy Definitions are available in your desired scope, you can assign the Policies to your Azure Subscriptions.  
+
+You can also use the ARM-DeployPolicyDefs-vNET-Hub-and-Spoke.json using a Management Group Deployment: https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deploy-to-management-group
+
+Example Deployment using Az Powershell Modules
+```
+$managementGroupId = "ID"
+$location = "eastus"
+New-AzManagementGroupDeployment -Name Hub-and-Spoke -ManagementGroupId $managementGroupId -Location $location `
+-TemplateUri https://raw.githubusercontent.com/lukearp/Enterprise-Landing-Zone-Policies/master/vNET-Hub-and-Spoke-Deployments/ARM-Deploy-Template/ARM-ManagementGroup-DeployPolicyDefs-vNET-Hub-and-Spoke.json `
+-TemplateParameterUri https://raw.githubusercontent.com/lukearp/Enterprise-Landing-Zone-Policies/master/vNET-Hub-and-Spoke-Deployments/ARM-Deploy-Template/ARM-ManagementGroup-DeployPolicyDefs-vNET-Hub-and-Spoke-Parameters.json
+```
+
+# How to support multiple subscription deployments?
+
+The Rememdiation task has to have rights to the HUB VNET.  When a Policy is assigned there is a Remediation Principal ID.  This is an Object ID of a Service principal.  This Object ID needs to be given rights to the Resource Group that has your HUB VNET.  This can easily be done using Cloud Shell:
+
+```
+New-AzRoleAssignment -ObjectId <Assignment Principal ID> -ResourceGroupName <resource group of hub vnet> -RoleDefinitionName "Contributor"
+```
+
 ## Deploy-vNET-Hub
 Parameters Required
 
@@ -143,27 +166,6 @@ JSON from Template:
 		"description": "Azure Region that VNET will be deployed to. Ex: eastus"
 	}
 }
-```
-
-# How to use these Policies?
-
-The files Deploy-vNet-Hub.json and Deploy-vNET-Spoke.json can be the body in a PUT REST call: https://docs.microsoft.com/en-us/rest/api/resources/policydefinitions/createorupdate.  Once the Policy Definitions are available in your desired scope, you can assign the Policies to your Azure Subscriptions.  
-
-You can also use the ARM-DeployPolicyDefs-vNET-Hub-and-Spoke.json using a Management Group Deployment: https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deploy-to-management-group
-
-Example Deployment using Az Powershell Modules
-```
-$managementGroupId = "ID"
-$location = "eastus"
-New-AzManagementGroupDeployment -Name Hub-and-Spoke -ManagementGroupId $managementGroupId -Location $location -TemplateFile .\ARM-ManagementGroup-DeployPolicyDefs-vNET-Hub-and-Spoke.json -TemplateParameterFile .\ARM-ManagementGroup-DeployPolicyDefs-vNET-Hub-and-Spoke-Parameters.json
-```
-
-# How to support multiple subscription deployments?
-
-The Rememdiation task has to have rights to the HUB VNET.  When a Policy is assigned there is a Remediation Principal ID.  This is an Object ID of a Service principal.  This Object ID needs to be given rights to the Resource Group that has your HUB VNET.  This can easily be done using Cloud Shell:
-
-```
-New-AzRoleAssignment -ObjectId <Assignment Principal ID> -ResourceGroupName <resource group of hub vnet> -RoleDefinitionName "Contributor"
 ```
 
 # What are some Features that are planned in the future?
