@@ -11,8 +11,8 @@ Example Deployment using Az Powershell Modules
 $managementGroupId = "ID"
 $location = "eastus"
 New-AzManagementGroupDeployment -Name Hub-and-Spoke -ManagementGroupId $managementGroupId -Location $location `
--TemplateUri https://raw.githubusercontent.com/lukearp/Enterprise-Landing-Zone-Policies/master/vNET-Hub-and-Spoke-Deployments/ARM-Deploy-Template/ARM-ManagementGroup-DeployPolicyDefs-vNET-Hub-and-Spoke.json `
--TemplateParameterUri https://raw.githubusercontent.com/lukearp/Enterprise-Landing-Zone-Policies/master/vNET-Hub-and-Spoke-Deployments/ARM-Deploy-Template/ARM-ManagementGroup-DeployPolicyDefs-vNET-Hub-and-Spoke-Parameters.json
+-TemplateUri https://raw.githubusercontent.com/lukearp/Enterprise-Landing-Zone-Policies/master/vNET-Hub-and-Spoke-Deployments/ARM-Deploy-Templates/ARM-ManagementGroup-DeployPolicyDefs-vNET-Hub-and-Spoke.json `
+-TemplateParameterUri https://raw.githubusercontent.com/lukearp/Enterprise-Landing-Zone-Policies/master/vNET-Hub-and-Spoke-Deployments/ARM-Deploy-Templates/ARM-ManagementGroup-DeployPolicyDefs-vNET-Hub-and-Spoke-Parameters.json
 ```
 
 # How to support multiple subscription deployments?
@@ -21,6 +21,13 @@ The Rememdiation task has to have rights to the HUB VNET.  When a Policy is assi
 
 ```
 New-AzRoleAssignment -ObjectId <Assignment Principal ID> -ResourceGroupName <resource group of hub vnet> -RoleDefinitionName "Contributor"
+```
+
+You can also use the Policy-Assignment-Scripts/Assign-Spoke-Policy.ps1 to assign and grant the System Assigned Identity Contributor rights to the Hub VNET.  It leverages the ARM-Deploy-Tempaltes/ARM-AssignSpokePolicy.json template.  Add values to the ARM-AssignSpokePolicy-Parameters.json and run the script.
+
+From the Policy-Assignment-Script folder within the repo:
+```
+.\Assign-Spoke-Policy.ps1 -managementGroupId MANAGEMENTGROUPID -assignmentName NAME-OF-POLICY-ASSIGNMENT -location DEPLOYMENT-LOCATION -spokeSubscriptionId TARGET-SUBSCRIPTION
 ```
 
 ## Deploy-vNET-Hub

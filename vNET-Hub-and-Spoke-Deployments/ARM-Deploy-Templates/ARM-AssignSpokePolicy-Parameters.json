@@ -1,0 +1,53 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "value": "",
+            "metadata": {
+                "description": "Name of spoke virtual network"
+            }
+        },
+        "resourceGroupName": {
+            "value": "",
+            "metadata": {
+                "description": "Name of spoke Resource Group"
+            }
+        },
+        "vnetAddressSpace": {
+            "value": "",
+            "metadata": {
+                "description": "Address SPace for VNET. Example: 10.0.0.0/24"
+            }
+        },
+        "dnsServers": {
+            "value": "10.1.1.1,10.1.1.2",
+            "metadata": {
+                "description": "Comma Seperated String Value for DNS Servers"
+            }
+        },
+        "subnets": {
+            "value": [
+                {
+                    "name": "test",
+                    "addressPrefix": "10.0.0.0/25"
+                }
+            ],
+            "metadata": {
+                "description": "Array of Subnet Configureations.  Object structure: {\"name\": \"subnetName\",\"addressPrefix\":\"10.0.0.0/24\"}"
+            }
+        },
+        "hubVnetId": {
+            "value": "/subscriptions/00000000-0000-0000-000000000000/resourceGroups/RESOURCEGROUPNAME/providers/Microsoft.Network/virtualNetworks/VNETNAME",
+            "metadata": {
+                "description": "ResourceID of HUB Virtual Network"
+            }
+        },
+        "location": {
+            "value": "eastus",
+            "metadata": {
+                "description": "Location you are wanting the Azure Resources to be deployed in."
+            }
+        }
+    }
+}
