@@ -21,8 +21,14 @@ $deployment= New-AzSubscriptionDeployment `
 
 Start-Sleep 30
 
-Select-AzSubscription -SubscriptionId $deployment.Outputs.vnetHub.Value.Split("/")[2]
 New-AzRoleAssignment `
 -ObjectId $deployment.Outputs.assignmentIdentity.Value `
--ResourceGroupName $deployment.Outputs.vnetHub.Value.Split("/")[4] `
+-Scope $("/subscriptions/" + $deployment.Outputs.vnetHub.Value.Split("/")[2] + "/resourceGroups/" + $deployment.Outputs.vnetHub.Value.Split("/")[4]) `
 -RoleDefinitionName "Network Contributor"
+
+New-AzRoleAssignment `
+-ObjectId $deployment.Outputs.assignmentIdentity.Value `
+-RoleDefinitionName "Contributor" `
+-Scope $("/subscriptions/" + $spokeSubscriptionId)
+
+Start-AzPolicyRemediation -PolicyAssignmentId $("/subscriptions/" + $spokeSubscriptionId + "/providers/Microsoft.Authorization/policyAssignments/" + $assignmentName) -Name $($assignmentName + "-Remediation")

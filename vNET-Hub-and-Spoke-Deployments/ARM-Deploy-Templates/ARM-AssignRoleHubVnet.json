@@ -1,0 +1,34 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "hubPolicyRoleAssignment": {
+            "type": "string",
+            "defaultValue": "[newGuid()]"
+        },
+        "assignmentName": {
+            "type":"string"
+        },
+        "hubVnetId": {
+            "type": "string"
+        }
+    },
+    "variables":{
+        "resourceIdHub": "[concat('/subscriptions/',split(parameters('hubVnetId'),'/')[2],'/resourceGroups/',split(parameters('hubVnetId'),'/')[4])]"
+    },
+    "resources": [        
+        {
+            "name": "[parameters('hubPolicyRoleAssignment')]",
+            "type": "Microsoft.Authorization/roleAssignments",
+            "dependsOn": [
+                "[parameters('assignmentName')]"
+            ],
+            "apiVersion": "2020-04-01-preview",
+            "properties": {
+                "roleDefinitionId": "4d97b98b-1d4f-4787-a291-c67834d212e7",
+                "principalId": "[reference(parameters('assignmentName'), '2019-01-01', 'FULL').identity.principalId]",
+                "scope": "[variables('resourceIdHub')]"
+            }
+        }
+    ]
+}
