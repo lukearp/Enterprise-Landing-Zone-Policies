@@ -1,0 +1,84 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "type": "string"
+        },
+        "resourceGroupName": {
+            "type": "string"
+        },
+        "vnetAddressSpace": {
+            "type": "string"
+        },
+        "dnsServers": {
+            "type": "string"
+        },
+        "subnets": {
+            "type": "array"
+        },
+        "hubVnetId": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "policyId": {
+            "type": "string"
+        },
+        "assignmentName": {
+            "type": "string"
+        }
+    },
+    "resources": [
+        {
+            "name": "[parameters('assignmentName')]",
+            "type": "Microsoft.Authorization/policyAssignments",
+            "apiVersion": "2019-01-01",
+            "properties": {
+                "displayName": "[parameters('assignmentName')]",
+                "policyDefinitionId": "[parameters('policyId')]",
+                "scope": "[subscription().id]",
+                "parameters": {
+                    "vnetName": {
+                        "value": "[parameters('vnetName')]"
+                    },
+                    "resourceGroupName": {
+                        "value": "[parameters('resourceGroupName')]"
+                    },
+                    "vnetAddressSpace": {
+                        "value": "[parameters('vnetAddressSpace')]"
+                    },
+                    "dnsServers": {
+                        "value": "[split(parameters('dnsServers'),',')]"
+                    },
+                    "subnets": {
+                        "value": "[parameters('subnets')]"
+                    },
+                    "hubVnetId": {
+                        "value": "[parameters('hubVnetId')]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }
+                },
+                "description": "Deploy-Spoke-VNET",
+                "metadata": {}
+            },
+            "location": "[parameters('location')]",
+            "identity": {
+                "type": "SystemAssigned"
+            }
+        }
+    ],
+    "outputs": {
+        "assignmentIdentity": {
+            "type": "string",
+            "value": "[reference(parameters('assignmentName'), '2019-01-01', 'FULL').identity.principalId]"
+        },
+        "vnetHub": {
+            "type": "string",
+            "value": "[parameters('hubVnetId')]"
+        }
+    }
+}
