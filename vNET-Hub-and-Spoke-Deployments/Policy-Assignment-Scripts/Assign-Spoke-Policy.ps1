@@ -19,6 +19,8 @@ $deployment= New-AzSubscriptionDeployment `
 -assignmentName $assignmentName `
 -policyId $policyId
 
+Start-Sleep 30
+
 Select-AzSubscription -SubscriptionId $deployment.Outputs.vnetHub.Value.Split("/")[2]
 New-AzRoleAssignment `
 -ObjectId $deployment.Outputs.assignmentIdentity.Value `
