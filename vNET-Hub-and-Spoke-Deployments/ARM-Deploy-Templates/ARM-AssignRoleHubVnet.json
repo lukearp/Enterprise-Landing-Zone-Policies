@@ -6,7 +6,7 @@
             "type": "string",
             "defaultValue": "[newGuid()]"
         },
-        "assignmentName": {
+        "assignmentNamePrincipalId": {
             "type":"string"
         },
         "hubVnetId": {
@@ -20,13 +20,10 @@
         {
             "name": "[parameters('hubPolicyRoleAssignment')]",
             "type": "Microsoft.Authorization/roleAssignments",
-            "dependsOn": [
-                "[parameters('assignmentName')]"
-            ],
             "apiVersion": "2020-04-01-preview",
             "properties": {
                 "roleDefinitionId": "4d97b98b-1d4f-4787-a291-c67834d212e7",
-                "principalId": "[reference(parameters('assignmentName'), '2019-01-01', 'FULL').identity.principalId]",
+                "principalId": "[parameters('assignmentNamePrincipalId')]",
                 "scope": "[variables('resourceIdHub')]"
             }
         }

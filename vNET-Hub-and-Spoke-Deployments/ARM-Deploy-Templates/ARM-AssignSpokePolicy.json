@@ -36,42 +36,68 @@
     },
     "resources": [
         {
-            "name": "[parameters('assignmentName')]",
-            "type": "Microsoft.Authorization/policyAssignments",
-            "apiVersion": "2019-01-01",
-            "properties": {
-                "displayName": "[parameters('assignmentName')]",
-                "policyDefinitionId": "[parameters('policyId')]",
-                "scope": "[subscription().id]",
-                "parameters": {
-                    "vnetName": {
-                        "value": "[parameters('vnetName')]"
-                    },
-                    "resourceGroupName": {
-                        "value": "[parameters('resourceGroupName')]"
-                    },
-                    "vnetAddressSpace": {
-                        "value": "[parameters('vnetAddressSpace')]"
-                    },
-                    "dnsServers": {
-                        "value": "[split(parameters('dnsServers'),',')]"
-                    },
-                    "subnets": {
-                        "value": "[parameters('subnets')]"
-                    },
-                    "hubVnetId": {
-                        "value": "[parameters('hubVnetId')]"
-                    },
-                    "location": {
-                        "value": "[parameters('location')]"
-                    }
-                },
-                "description": "Deploy-Spoke-VNET",
-                "metadata": {}
-            },
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(parameters('assignmentName'),'-Assignment')]",
             "location": "[parameters('location')]",
-            "identity": {
-                "type": "SystemAssigned"
+            "properties": {
+                "mode": "incremental",
+                "template": {
+                    "$schema": "http://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "resources": [
+                        {
+                            "name": "[parameters('assignmentName')]",
+                            "type": "Microsoft.Authorization/policyAssignments",
+                            "apiVersion": "2019-01-01",
+                            "properties": {
+                                "displayName": "[parameters('assignmentName')]",
+                                "policyDefinitionId": "[parameters('policyId')]",
+                                "scope": "[subscription().id]",
+                                "parameters": {
+                                    "vnetName": {
+                                        "value": "[parameters('vnetName')]"
+                                    },
+                                    "resourceGroupName": {
+                                        "value": "[parameters('resourceGroupName')]"
+                                    },
+                                    "vnetAddressSpace": {
+                                        "value": "[parameters('vnetAddressSpace')]"
+                                    },
+                                    "dnsServers": {
+                                        "value": "[split(parameters('dnsServers'),',')]"
+                                    },
+                                    "subnets": {
+                                        "value": "[parameters('subnets')]"
+                                    },
+                                    "hubVnetId": {
+                                        "value": "[parameters('hubVnetId')]"
+                                    },
+                                    "location": {
+                                        "value": "[parameters('location')]"
+                                    }
+                                },
+                                "description": "Deploy-Spoke-VNET",
+                                "metadata": {}
+                            },
+                            "location": "[parameters('location')]",
+                            "identity": {
+                                "type": "SystemAssigned"
+                            }
+                        }
+                    ],
+                    "outputs": {
+                        "assignmentIdentity": {
+                            "type": "string",
+                            "value": "[reference(parameters('assignmentName'), '2019-01-01', 'FULL').identity.principalId]"
+                        },
+                        "vnetHub": {
+                            "type": "string",
+                            "value": "[parameters('hubVnetId')]"
+                        }
+                    }
+                }
             }
         },
         {
@@ -83,7 +109,7 @@
             "apiVersion": "2020-04-01-preview",
             "properties": {
                 "roleDefinitionId": "4d97b98b-1d4f-4787-a291-c67834d212e7",
-                "principalId": "[reference(parameters('assignmentName'), '2019-01-01', 'FULL').identity.principalId]",
+                "principalId": "[reference(parameters('assignmentName')).outputs.assignmentIdentity.value]",
                 "scope": "[subscription().id]"
             }
         },
@@ -91,18 +117,19 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "linkedTemplate",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[parameters('assignmentName')]"
             ],
             "properties": {
+                "subscriptionId": "[split(parameters('hubVnetId'),'/')[2]]",
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/lukearp/Enterprise-Landing-Zone-Policies/master/vNET-Hub-and-Spoke-Deployments/ARM-Deploy-Templates/ARM-AssignRoleHubVnet.json",
-                    "contentVersion": "1.0.0.0"
+                    "uri": "https://raw.githubusercontent.com/lukearp/Enterprise-Landing-Zone-Policies/master/vNET-Hub-and-Spoke-Deployments/ARM-Deploy-Templates/ARM-AssignRoleHubVnet.json"
                 },
                 "parameters": {
-                    "assignmentName": {
-                        "value": "[reference(parameters('assignmentName'), '2019-01-01', 'FULL').identity.principalId]"
+                    "assignmentNamePrincipalId": {
+                        "value": "[reference(parameters('assignmentName')).outputs.assignmentIdentity.value]"
                     },
                     "hubVnetId": {
                         "value": "[parameters('hubVnetId')]"
@@ -110,15 +137,5 @@
                 }
             }
         }
-    ],
-    "outputs": {
-        "assignmentIdentity": {
-            "type": "string",
-            "value": "[reference(parameters('assignmentName'), '2019-01-01', 'FULL').identity.principalId]"
-        },
-        "vnetHub": {
-            "type": "string",
-            "value": "[parameters('hubVnetId')]"
-        }
-    }
+    ]
 }
