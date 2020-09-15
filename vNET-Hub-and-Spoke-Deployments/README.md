@@ -2,7 +2,7 @@
 
 # What do these Policies do?
 
-The two Policies in this folder are focused on deploying a [Hub and Spoke Azure VNET architecture]https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/hub-spoke-network-topology#:~:text=Hub%20and%20spoke%20network%20topology%201%20Overview.%20As,complex%20multitier%20workloads%20in%20a%20single%20spoke.%20). 
+The two Policies in this folder are focused on deploying a [Hub and Spoke Azure VNET architecture](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/hub-spoke-network-topology#:~:text=Hub%20and%20spoke%20network%20topology%201%20Overview.%20As,complex%20multitier%20workloads%20in%20a%20single%20spoke.%20). 
 
 The Deploy-vNet-Hub will deploy a Hub Virtual Network with an Azure VPN Gateway.  You also have the option to define subnet space for an Azure Firewall and Bastion host.  If you add the address space, the appliances will be deployed into the Resource Group.  
 
