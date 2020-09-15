@@ -14,12 +14,12 @@ $policyId = "/providers/Microsoft.Management/managementGroups/$($managementGroup
 Select-AzSubscription -SubscriptionId $spokeSubscriptionId
 $deployment= New-AzSubscriptionDeployment `
 -Name $assignmentName -Location $location `
--TemplateParameterFile ..\ARM-Deploy-Templates\ARM-AssignSpokePolicy-Parameters.json `
--TemplateFile ..\ARM-Deploy-Templates\ARM-AssignSpokePolicy.json `
+-TemplateParameterFile ..\ARM-Deploy-Templates\Policy-Assignment\ARM-AssignSpokePolicy-Parameters.json `
+-TemplateFile ..\ARM-Deploy-Templates\Policy-Assignment\ARM-AssignSpokePolicy.json `
 -assignmentName $assignmentName `
 -policyId $policyId
 
-Start-Sleep 30
+Start-Sleep 120
 
 New-AzRoleAssignment `
 -ObjectId $deployment.Outputs.assignmentIdentity.Value `
@@ -31,4 +31,4 @@ New-AzRoleAssignment `
 -RoleDefinitionName "Contributor" `
 -Scope $("/subscriptions/" + $spokeSubscriptionId)
 
-Start-AzPolicyRemediation -PolicyAssignmentId $("/subscriptions/" + $spokeSubscriptionId + "/providers/Microsoft.Authorization/policyAssignments/" + $assignmentName) -Name $($assignmentName + "-Remediation")
+Start-AzPolicyRemediation -PolicyAssignmentId $("/subscriptions/" + $spokeSubscriptionId + "/providers/Microsoft.Authorization/policyAssignments/" + $assignmentName) -Name $($assignmentName + "-Remediation") -ResourceDiscoveryMode ReEvaluateCompliance
