@@ -43,6 +43,12 @@
                                 "gatewaySubnetAddressPrefix": {
                                     "value": "[parameters('gatewaySubnetAddressPrefix')]"
                                 },
+                                "firewallSubnetAddressPrefix": {
+                                    "value": "[parameters('firewallSubnetAddressPrefix')]"
+                                },
+                                "bastionSubnetAddressPrefix": {
+                                    "value": "[parameters('bastionSubnetAddressPrefix')]"
+                                },
                                 "subnets": {
                                     "value": "[parameters('subnets')]"
                                 },
@@ -73,6 +79,12 @@
                                         "type": "array"
                                     },
                                     "gatewaySubnetAddressPrefix": {
+                                        "type": "string"
+                                    },
+                                    "firewallSubnetAddressPrefix": {
+                                        "type": "string"
+                                    },
+                                    "bastionSubnetAddressPrefix": {
                                         "type": "string"
                                     },
                                     "subnets": {
@@ -116,7 +128,19 @@
                                             "addressPrefix": "[parameters('gatewaySubnetAddressPrefix')]"
                                         }
                                     },
-                                    "finalSubnetArray": "[concat(variables('subnets').subnetArray,array(variables('GatewaySubnet')))]",
+                                    "FirewallSubnet": {
+                                        "name": "AzureFirewallSubnet",
+                                        "properties": {
+                                            "addressPrefix": "[parameters('firewallSubnetAddressPrefix')]"
+                                        }
+                                    },
+                                    "Bastion": {
+                                        "name": "AzureBastionSubnet",
+                                        "properties": {
+                                            "addressPrefix": "[parameters('bastionSubnetAddressPrefix')]"
+                                        }
+                                    },
+                                    "finalSubnetArray": "[if(and(equals(parameters('firewallSubnetAddressPrefix'),''),equals(parameters('bastionSubnetAddressPrefix'),'')),concat(variables('subnets').subnetArray,array(variables('GatewaySubnet'))),if(and(not(empty(parameters('firewallSubnetAddressPrefix'))),equals(parameters('bastionSubnetAddressPrefix'),'')),concat(variables('subnets').subnetArray,array(variables('GatewaySubnet')),array(variables('FirewallSubnet'))),if(and(not(empty(parameters('bastionSubnetAddressPrefix'))),equals(parameters('firewallSubnetAddressPrefix'),'')),concat(variables('subnets').subnetArray,array(variables('GatewaySubnet')),array(variables('Bastion'))),if(and(not(empty(parameters('bastionSubnetAddressPrefix'))),not(empty(parameters('firewallSubnetAddressPrefix')))),concat(variables('subnets').subnetArray,array(variables('GatewaySubnet')),array(variables('Bastion')),array(variables('FirewallSubnet'))),concat(variables('subnets').subnetArray,array(variables('GatewaySubnet')))))))]",                                            
                                     "vpnGatewayProperties": {
                                         "ipConfigurations": [
                                             {
@@ -307,6 +331,20 @@
                 "metadata": {
                     "description": "Subnet address space for the VPN/Express Route Gateway. Ex: \"10.0.3.224/27\""
                 }
+            },
+            "firewallSubnetAddressPrefix": {
+                "type": "string",
+                "metadata": {
+                    "description": "Leave Empty if you don't want to deploy. Subnet address space for an Azure Firewall. Ex: \"10.0.3.0/25\""
+                },
+                "defaultValue": ""
+            },
+            "bastionSubnetAddressPrefix": {
+                "type": "string",
+                "metadata": {
+                    "description": "Leave Empty if you don't want to deploy. Subnet address space for an Azure Bastion Host. Ex: \"10.0.3.192/27\""
+                },
+                "defaultValue": ""
             },
             "subnets": {
                 "type": "Array",

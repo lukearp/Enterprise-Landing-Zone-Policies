@@ -1,5 +1,16 @@
 # Policies
 
+# What do these Policies do?
+
+The two Policies in this folder are focused on deploying a [Hub and Spoke Azure VNET architecture]https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/hub-spoke-network-topology#:~:text=Hub%20and%20spoke%20network%20topology%201%20Overview.%20As,complex%20multitier%20workloads%20in%20a%20single%20spoke.%20). 
+
+The Deploy-vNet-Hub will deploy a Hub Virtual Network with an Azure VPN Gateway.  You also have the option to define subnet space for an Azure Firewall and Bastion host.  If you add the address space, the appliances will be deployed into the Resource Group.  
+
+The Deploy-vNet-Spoke will deploy a Virtual Network and then peer to a Hub Virtual Network with Gateway Transit configured.  
+
+All Subnets defined in the policy will have Network Security Groups created, except for special subnets used for Gateways, Firewalls, and Bastion Hosts.
+ 
+
 # How to use these Policies?
 
 The files Deploy-vNet-Hub.json and Deploy-vNET-Spoke.json can be the body in a PUT REST call: https://docs.microsoft.com/en-us/rest/api/resources/policydefinitions/createorupdate.  Once the Policy Definitions are available in your desired scope, you can assign the Policies to your Azure Subscriptions.  
@@ -40,6 +51,8 @@ Parameters Required
 |vnetAddressSpace|The IPv4 Address Space for the Spoke VNET. Ex: \"10.10.0.0/22\"|
 |dnsServers| Arrary of DNS Service IPs if wanting to use Custom DNS.  Ex: [\"10.10.1.1\",\"10.10.1.2\"]|
 |gatewaySubnetAddressPrefix|Subnet address space for the VPN/Express Route Gateway. Ex: \"10.0.3.224/27\"|
+|firewallSubnetAddressPrefix|Leave Empty if you don't want to deploy. Subnet address space for an Azure Firewall. Ex: \"10.0.3.0/26\"|
+|bastionSubnetAddressPrefix|Leave Empty if you don't want to deploy. Subnet address space for an Azure Bastion Host. Ex: \"10.0.3.192/27\"|
 |subnets|Names and address spaces of your Subnets.  Objects need a Name and Address Preffix property Ex: [{\"name\": \"subnet1\",\"addressPrefix\":\"10.10.0.0/24\"},{\"name\": \"subnet2\",\"addressPrefix\":\"10.10.1.0/24\"}]|
 |gatewayType|Azure Gateway type. VPN or ExpressRoute|
 |gatewaySku|Azure Gateway Sku. Currently, this template does not support Availability Zone Gateway SKUs|
@@ -177,4 +190,4 @@ JSON from Template:
 
 # What are some Features that are planned in the future?
 
-I am planning on adding the ability to deploy an Azure Firewall in the HUB.  I will also be adding the option for deploying an Azure Bastion Host.  If there are any features that are wanted, submit an issue.  
+If there are any features that are wanted, submit an issue.  

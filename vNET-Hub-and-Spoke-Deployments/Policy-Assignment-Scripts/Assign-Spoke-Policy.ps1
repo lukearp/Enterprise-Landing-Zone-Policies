@@ -30,5 +30,3 @@ New-AzRoleAssignment `
 -ObjectId $deployment.Outputs.assignmentIdentity.Value `
 -RoleDefinitionName "Contributor" `
 -Scope $("/subscriptions/" + $spokeSubscriptionId)
-
-Start-AzPolicyRemediation -PolicyAssignmentId $("/subscriptions/" + $spokeSubscriptionId + "/providers/Microsoft.Authorization/policyAssignments/" + $assignmentName) -Name $($assignmentName + "-Remediation") -ResourceDiscoveryMode ReEvaluateCompliance
