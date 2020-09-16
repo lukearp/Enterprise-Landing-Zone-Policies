@@ -512,7 +512,7 @@
                             "VpnGw4",
                             "VpnGw5"
                         ],
-                        "defaultValue": "Basic",
+                        "defaultValue": "Standard",
                         "metadata": {
                             "description": "Azure Gateway Sku. Currently, this template does not support Availability Zone Gateway SKUs"
                         }
@@ -814,6 +814,472 @@
                         "type": "String",
                         "metadata": {
                             "description": "Azure Region that VNET will be deployed to. Ex: eastus"
+                        }
+                    }
+                }
+            }
+        },
+        "input3": {
+            "value": {
+                "mode": "All",
+                "policyType": "Custom",
+                "displayName": "Deploy-SitetoSite-VPN",
+                "description": "Deploy A Site to Site VPN Connection.  Assing Policy to Resource Group that has you VPN Gateway that will be terminating the VPN Connection",
+                "metadata": {
+                    "category": "Enterprise Landing Zone"
+                },
+                "policyRule": {
+                    "if": {
+                        "field": "type",
+                        "equals": "Microsoft.Resources/subscriptions"
+                    },
+                    "then": {
+                        "effect": "deployIfNotExists",
+                        "details": {
+                            "type": "Microsoft.Network/connections",
+                            "name": "[parameters('vpnConnectionName')]",
+                            "ResourceGroupName": "[parameters('azureGatewayResourceGroupName')]",
+                            "roleDefinitionIds": [
+                                "/providers/Microsoft.Authorization/roleDefinitions/4d97b98b-1d4f-4787-a291-c67834d212e7"
+                            ],
+                            "existenceScope": "ResourceGroup",
+                            "deploymentScope": "ResourceGroup",
+                            "deployment": {
+                                "properties": {
+                                    "mode": "incremental",
+                                    "parameters": {
+                                        "vpnConnectionName": {
+                                            "value": "[parameters('vpnConnectionName')]"
+                                        },
+                                        "remoteVpnPeerIp": {
+                                            "value": "[parameters('remoteVpnPeerIp')]"
+                                        },
+                                        "remoteNetworks": {
+                                            "value": "[parameters('remoteNetworks')]"
+                                        },
+                                        "connectionProtocol": {
+                                            "value": "[parameters('connectionProtocol')]"
+                                        },
+                                        "sharedKey": {
+                                            "value": "[parameters('sharedKey')]"
+                                        },
+                                        "phase1Integrity": {
+                                            "value": "[parameters('phase1Integrity')]"
+                                        },
+                                        "phase1Encryption": {
+                                            "value": "[parameters('phase1Encryption')]"
+                                        },
+                                        "phase1DhGroup": {
+                                            "value": "[parameters('phase1DhGroup')]"
+                                        },
+                                        "phase2Integrity": {
+                                            "value": "[parameters('phase2Integrity')]"
+                                        },
+                                        "phase2Encryption": {
+                                            "value": "[parameters('phase2Encryption')]"
+                                        },
+                                        "phase2PfsGroup": {
+                                            "value": "[parameters('phase2PfsGroup')]"
+                                        },
+                                        "phase2LifeTimeSeconds": {
+                                            "value": "[parameters('phase2LifeTimeSeconds')]"
+                                        },
+                                        "phase2LifeTimeKB": {
+                                            "value": "[parameters('phase2LifeTimeKB')]"
+                                        },
+                                        "isPolicyBasedVPN": {
+                                            "value": "[parameters('isPolicyBasedVPN')]"
+                                        },
+                                        "bgpPeerIp": {
+                                            "value": "[parameters('bgpPeerIp')]"
+                                        },
+                                        "bgpAsn": {
+                                            "value": "[parameters('bgpAsn')]"
+                                        },
+                                        "azureGatewayName": {
+                                            "value": "[parameters('azureGatewayName')]"
+                                        },
+                                        "location": {
+                                            "value": "[parameters('location')]"
+                                        }
+                                    },
+                                    "template": {
+                                        "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                                        "contentVersion": "1.0.0.0",
+                                        "parameters": {
+                                            "vpnConnectionName": {
+                                                "type": "string"
+                                            },
+                                            "remoteVpnPeerIp": {
+                                                "type": "string"
+                                            },
+                                            "remoteNetworks": {
+                                                "type": "string"
+                                            },
+                                            "connectionProtocol": {
+                                                "type": "string",
+                                                "allowedValues": [
+                                                    "IKEv2",
+                                                    "IKEv1"
+                                                ],
+                                                "defaultValue": "IKEv2"
+                                            },
+                                            "sharedKey": {
+                                                "type": "string"
+                                            },
+                                            "phase1Integrity": {
+                                                "type": "string",
+                                                "allowedValues": [
+                                                    "MD5",
+                                                    "SHA1",
+                                                    "SHA256",
+                                                    "GCMAES128",
+                                                    "GCMAES192",
+                                                    "GCMAES256"
+                                                ]
+                                            },
+                                            "phase1Encryption": {
+                                                "type": "string",
+                                                "allowedValues": [
+                                                    "None",
+                                                    "DES",
+                                                    "DES3",
+                                                    "AES128",
+                                                    "AES192",
+                                                    "AES256",
+                                                    "GCMAES128",
+                                                    "GCMAES192",
+                                                    "GCMAES256"
+                                                ]
+                                            },
+                                            "phase1DhGroup": {
+                                                "type": "string",
+                                                "allowedValues": [
+                                                    "None",
+                                                    "DHGroup1",
+                                                    "DHGroup2",
+                                                    "DHGroup14",
+                                                    "DHGroup2048",
+                                                    "ECP256",
+                                                    "ECP384",
+                                                    "DHGroup24"
+                                                ]
+                                            },
+                                            "phase2Integrity": {
+                                                "type": "string",
+                                                "allowedValues": [
+                                                    "MD5",
+                                                    "SHA1",
+                                                    "SHA256",
+                                                    "SHA384",
+                                                    "GCMAES256",
+                                                    "GCMAES128"
+                                                ]
+                                            },
+                                            "phase2Encryption": {
+                                                "type": "string",
+                                                "allowedValues": [
+                                                    "DES",
+                                                    "DES3",
+                                                    "AES128",
+                                                    "AES192",
+                                                    "AES256",
+                                                    "GCMAES256",
+                                                    "GCMAES128"
+                                                ]
+                                            },
+                                            "phase2PfsGroup": {
+                                                "type": "string",
+                                                "allowedValues": [
+                                                    "None",
+                                                    "PFS1",
+                                                    "PFS2",
+                                                    "PFS2048",
+                                                    "ECP256",
+                                                    "ECP384",
+                                                    "PFS24",
+                                                    "PFS14",
+                                                    "PFSMM"
+                                                ]
+                                            },
+                                            "phase2LifeTimeSeconds": {
+                                                "type": "int"
+                                            },
+                                            "phase2LifeTimeKB": {
+                                                "type": "int"
+                                            },
+                                            "isPolicyBasedVPN": {
+                                                "type": "bool"
+                                            },
+                                            "bgpPeerIp": {
+                                                "type": "string"
+                                            },
+                                            "bgpAsn": {
+                                                "type": "string"
+                                            },
+                                            "azureGatewayName": {
+                                                "type": "string"
+                                            },
+                                            "location": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "variables": {
+                                            "localNetworkGatewayPropertiesBgp": {
+                                                "localNetworkAddressSpace": {
+                                                    "addressPrefixes": "[split(parameters('remoteNetworks'),',')]"
+                                                },
+                                                "gatewayIpAddress": "[parameters('remoteVpnPeerIp')]",
+                                                "bgpSettings": {
+                                                    "asn": "[parameters('bgpAsn')]",
+                                                    "bgpPeeringAddress": "[parameters('bgpPeerIp')]"
+                                                }
+                                            },
+                                            "localNetworkGatewayProperties": {
+                                                "localNetworkAddressSpace": {
+                                                    "addressPrefixes": "[split(parameters('remoteNetworks'),',')]"
+                                                },
+                                                "gatewayIpAddress": "[parameters('remoteVpnPeerIp')]"
+                                            },
+                                            "emptyObject": {},
+                                            "virtualNetworkGatewayId": "[concat(resourceGroup().id,'/providers/Microsoft.Network/virtualNetworkGateways/',parameters('azureGatewayName'))]",
+                                            "ipsecPolicy": {
+                                                "saLifeTimeSeconds": "[parameters('phase2LifeTimeSeconds')]",
+                                                "saDataSizeKilobytes": "[parameters('phase2LifeTimeKB')]",
+                                                "ipsecEncryption": "[parameters('phase1Encryption')]",
+                                                "ipsecIntegrity": "[parameters('phase1Integrity')]",
+                                                "ikeEncryption": "[parameters('phase2Encryption')]",
+                                                "ikeIntegrity": "[parameters('phase2Integrity')]",
+                                                "dhGroup": "[parameters('phase1DhGroup')]",
+                                                "pfsGroup": "[parameters('phase2PfsGroup')]"
+                                            }
+                                        },
+                                        "resources": [
+                                            {
+                                                "name": "[concat(parameters('vpnConnectionName'),'-localgw')]",
+                                                "type": "Microsoft.Network/localNetworkGateways",
+                                                "apiVersion": "2020-05-01",
+                                                "location": "[parameters('location')]",
+                                                "tags": {},
+                                                "properties": "[if(and(not(empty(parameters('bgpPeerIp'))),not(empty(parameters('bgpAsn')))),variables('localNetworkGatewayPropertiesBgp'),variables('localNetworkGatewayProperties'))]"
+                                            },
+                                            {
+                                                "name": "[parameters('vpnConnectionName')]",
+                                                "type": "Microsoft.Network/connections",
+                                                "apiVersion": "2020-05-01",
+                                                "location": "[parameters('location')]",
+                                                "dependsOn": [
+                                                    "[concat(parameters('vpnConnectionName'),'-localgw')]"
+                                                ],
+                                                "tags": {},
+                                                "properties": {
+                                                    "virtualNetworkGateway1": {
+                                                        "id": "[variables('virtualNetworkGatewayId')]"
+                                                    },
+                                                    "localNetworkGateway2": {
+                                                        "id": "[resourceId('Microsoft.Network/localNetworkGateways',concat(parameters('vpnConnectionName'),'-localgw'))]"
+                                                    },
+                                                    "connectionType": "IPsec",
+                                                    "connectionProtocol": "[parameters('connectionProtocol')]",
+                                                    "sharedKey": "[parameters('sharedKey')]",
+                                                    "usePolicyBasedTrafficSelectors": "[parameters('isPolicyBasedVPN')]",
+                                                    "ipsecPolicies": [
+                                                        "[variables('ipsecPolicy')]"
+                                                    ],
+                                                    "enableBgp": "[if(and(not(empty(parameters('bgpPeerIp'))),not(empty(parameters('bgpAsn')))),bool('true'),bool('false'))]"
+                                                }
+                                            }
+                                        ],
+                                        "outputs": {
+                                            "test": {
+                                                "type": "object",
+                                                "value": "[if(and(not(empty(parameters('bgpPeerIp'))),not(empty(parameters('bgpAsn')))),variables('localNetworkGatewayPropertiesBgp'),variables('localNetworkGatewayProperties'))]"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters":{
+                    "vpnConnectionName": {
+                        "type": "string",
+                        "metadata":{
+                            "description": "Name of Azure Connection Object"
+                        }
+                    },
+                    "remoteVpnPeerIp": {
+                        "type": "string",
+                        "metadata":{
+                            "description": "Peer IP of remote Gateway to build VPN Connection"
+                        }
+                    },
+                    "remoteNetworks": {
+                        "type": "string",
+                        "metadata":{
+                            "description": "Comma seperated address prefixes that represents the remote networks.  Ex: \"172.16.0.0/24,172.16.1.0/24\""
+                        }
+                    },
+                    "connectionProtocol": {
+                        "type": "string",
+                        "metadata":{
+                            "description": "IKE Version, IKEv1 or IKEv2"
+                        },
+                        "allowedValues": [
+                            "IKEv2",
+                            "IKEv1"
+                        ],
+                        "defaultValue": "IKEv2"
+                    },
+                    "sharedKey": {
+                        "type": "string",
+                        "metadata":{
+                            "description": "Preshared Key for VPN Connection"
+                        }
+                    },
+                    "phase1Integrity": {
+                        "type": "string",
+                        "metadata":{
+                            "description": "Phase 1 Integrity"
+                        },
+                        "allowedValues": [
+                            "MD5",
+                            "SHA1",
+                            "SHA256",
+                            "GCMAES128",
+                            "GCMAES192",
+                            "GCMAES256"
+                        ]
+                    },
+                    "phase1Encryption": {
+                        "type": "string",
+                        "metadata":{
+                            "description": "Phase 1 Encryption"
+                        },
+                        "allowedValues": [
+                            "None",
+                            "DES",
+                            "DES3",
+                            "AES128",
+                            "AES192",
+                            "AES256",
+                            "GCMAES128",
+                            "GCMAES192",
+                            "GCMAES256"
+                        ]
+                    },
+                    "phase1DhGroup": {
+                        "type": "string",
+                        "metadata":{
+                            "description": "Phase 1 DH Group"
+                        },
+                        "allowedValues": [
+                            "None",
+                            "DHGroup1",
+                            "DHGroup2",
+                            "DHGroup14",
+                            "DHGroup2048",
+                            "ECP256",
+                            "ECP384",
+                            "DHGroup24"
+                        ]
+                    },
+                    "phase2Integrity": {
+                        "type": "string",
+                        "metadata":{
+                            "description": "Phase 2 Integrity"
+                        },
+                        "allowedValues": [
+                            "MD5",
+                            "SHA1",
+                            "SHA256",
+                            "SHA384",
+                            "GCMAES256",
+                            "GCMAES128"
+                        ]
+                    },
+                    "phase2Encryption": {
+                        "type": "string",
+                        "metadata":{
+                            "description": "Phase 2 Encryption"
+                        },
+                        "allowedValues": [
+                            "DES",
+                            "DES3",
+                            "AES128",
+                            "AES192",
+                            "AES256",
+                            "GCMAES256",
+                            "GCMAES128"
+                        ]
+                    },
+                    "phase2PfsGroup": {
+                        "type": "string",
+                        "metadata":{
+                            "description": "Phase 2 PFS Group"
+                        },
+                        "allowedValues": [
+                            "None",
+                            "PFS1",
+                            "PFS2",
+                            "PFS2048",
+                            "ECP256",
+                            "ECP384",
+                            "PFS24",
+                            "PFS14",
+                            "PFSMM"
+                        ]
+                    },
+                    "phase2LifeTimeSeconds": {
+                        "type": "integer",
+                        "metadata":{
+                            "description": "Phase 2 Lifetime in Seconds"
+                        },
+                        "defaultValue": 27000
+                    },
+                    "phase2LifeTimeKB": {
+                        "type": "integer",
+                        "metadata":{
+                            "description": "Phase 2 Lifetime in KB"
+                        },
+                        "defaultValue": 102400000
+                    },
+                    "isPolicyBasedVPN": {
+                        "type": "boolean",
+                        "defaultValue": false,
+                        "metadata":{
+                            "description": "If the VPN will be a Policy Based connection."
+                        }
+                    },
+                    "bgpPeerIp": {
+                        "type": "string",
+                        "metadata":{
+                            "description": "Remote BGP Peer IP.  If not using BGP leave blank.  BGP is not an Option on Policy VPNs"
+                        }
+                    },
+                    "bgpAsn": {
+                        "type": "string",
+                        "metadata":{
+                            "description": "Remote BGP ASN.  If not using BGP leave blank.  BGP is not an Option on Policy VPNs"
+                        }
+                    },
+                    "azureGatewayName": {
+                        "type": "string",
+                        "metadata":{
+                            "description": "Name of Azure VPN Gateway."
+                        }
+                    },
+                    "azureGatewayResourceGroupName": {
+                        "type": "string",
+                        "metadata":{
+                            "description": "Name of Azure VPN Gateway Resource Group."
+                        }
+                    },
+                    "location": {
+                        "type": "string",
+                        "metadata":{
+                            "description": "Azure Region for Azure VPN Gateway"
                         }
                     }
                 }

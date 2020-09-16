@@ -9,7 +9,8 @@ The Deploy-vNet-Hub will deploy a Hub Virtual Network with an Azure VPN Gateway.
 The Deploy-vNet-Spoke will deploy a Virtual Network and then peer to a Hub Virtual Network with Gateway Transit configured.  
 
 All Subnets defined in the policy will have Network Security Groups created, except for special subnets used for Gateways, Firewalls, and Bastion Hosts.
- 
+
+The Deploy-SitetoSite-VPN will configure a Local Network Gateway and Connection object linked to your Virtual Network Gateway.  It allows you to configure all your Phase1 and Phase2 settings aswell as enable BGP.  This Policy will only work on Standard tier or above Virtual Network Gateway.  
 
 # How to use these Policies?
 
@@ -187,6 +188,29 @@ JSON from Template:
 	}
 }
 ```
+## Deploy-SitetoSite-VPN
+Parameters Required
+
+|Parameter Name|Description|
+|vpnConnectionName|Name of Azure Connection Object|
+|remoteVpnPeerIp|Peer IP of remote Gateway to build VPN Connection|
+|remoteNetworks|Comma seperated address prefixes that represents the remote networks.  Ex: \"172.16.0.0/24,172.16.1.0/24\"|
+|connectionProtocol|IKE Version, IKEv1 or IKEv2|
+|sharedKey|Preshared Key for VPN Connection|
+|phase1Integrity|Phase 1 Integrity|
+|phase1Encryption|Phase 1 Encryption|
+|phase1DhGroup|Phase 1 DH Group|
+|phase2Integrity|Phase 2 Integrity|
+|phase2Encryption|Phase 2 Encryption|
+|phase2PfsGroup|Phase 2 Lifetime in Seconds|
+|phase2LifeTimeSeconds|Phase 2 Lifetime in Seconds|
+|phase2LifeTimeKB|Phase 2 Lifetime in KB|
+|isPolicyBasedVPN|If the VPN will be a Policy Based connection.|
+|bgpPeerIp|Remote BGP Peer IP.  If not using BGP leave blank.  BGP is not an Option on Policy VPNs|
+|bgpAsn|Remote BGP ASN.  If not using BGP leave blank.  BGP is not an Option on Policy VPNs|
+|azureGatewayName|Name of Azure VPN Gateway.|
+|azureGatewayResourceGroupName|Name of Azure VPN Gateway Resource Group.|
+|location|Azure Region for Azure VPN Gateway|
 
 # What are some Features that are planned in the future?
 

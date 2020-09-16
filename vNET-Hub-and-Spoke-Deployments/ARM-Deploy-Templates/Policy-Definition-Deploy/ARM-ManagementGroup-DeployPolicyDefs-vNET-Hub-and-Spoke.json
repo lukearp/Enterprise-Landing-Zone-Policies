@@ -7,6 +7,9 @@
         },
         "input2": {
             "type": "object"
+        },
+        "input3": {
+            "type": "object"
         }
     },
     "variables": {
@@ -23,6 +26,12 @@
             "type": "Microsoft.Authorization/policyDefinitions",
             "apiVersion": "2019-09-01",
             "properties": "[parameters('input2')]"
+        },
+        {
+            "name": "Deploy-SitetoSite-VPN",
+            "type": "Microsoft.Authorization/policyDefinitions",
+            "apiVersion": "2019-09-01",
+            "properties": "[parameters('input3')]"
         }
     ]
 }

@@ -369,7 +369,7 @@
                 "allowedValues": [
                     "Basic", "HighPerformance", "Standard", "UltraPerformance", "VpnGw1", "VpnGw2", "VpnGw3", "VpnGw4", "VpnGw5"
                 ],
-                "defaultValue": "Basic",
+                "defaultValue": "Standard",
                 "metadata": {
                     "description": "Azure Gateway Sku. Currently, this template does not support Availability Zone Gateway SKUs"
                 }
