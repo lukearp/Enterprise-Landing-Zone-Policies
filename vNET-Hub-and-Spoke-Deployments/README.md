@@ -192,6 +192,7 @@ JSON from Template:
 Parameters Required
 
 |Parameter Name|Description|
+|--|--|
 |vpnConnectionName|Name of Azure Connection Object|
 |remoteVpnPeerIp|Peer IP of remote Gateway to build VPN Connection|
 |remoteNetworks|Comma seperated address prefixes that represents the remote networks.  Ex: \"172.16.0.0/24,172.16.1.0/24\"|
@@ -211,6 +212,189 @@ Parameters Required
 |azureGatewayName|Name of Azure VPN Gateway.|
 |azureGatewayResourceGroupName|Name of Azure VPN Gateway Resource Group.|
 |location|Azure Region for Azure VPN Gateway|
+
+Json Parameters:
+```
+"vpnConnectionName": {
+	"type": "string",
+	"metadata": {
+		"description": "Name of Azure Connection Object"
+	}
+},
+"remoteVpnPeerIp": {
+	"type": "string",
+	"metadata": {
+		"description": "Peer IP of remote Gateway to build VPN Connection"
+	}
+},
+"remoteNetworks": {
+	"type": "string",
+	"metadata": {
+		"description": "Comma seperated address prefixes that represents the remote networks.  Ex: \"172.16.0.0/24,172.16.1.0/24\""
+	}
+},
+"connectionProtocol": {
+	"type": "string",
+	"metadata": {
+		"description": "IKE Version, IKEv1 or IKEv2"
+	},
+	"allowedValues": [
+		"IKEv2",
+		"IKEv1"
+	],
+	"defaultValue": "IKEv2"
+},
+"sharedKey": {
+	"type": "string",
+	"metadata": {
+		"description": "Preshared Key for VPN Connection"
+	}
+},
+"phase1Integrity": {
+	"type": "string",
+	"metadata": {
+		"description": "Phase 1 Integrity"
+	},
+	"allowedValues": [
+		"MD5",
+		"SHA1",
+		"SHA256",
+		"GCMAES128",
+		"GCMAES192",
+		"GCMAES256"
+	]
+},
+"phase1Encryption": {
+	"type": "string",
+	"metadata": {
+		"description": "Phase 1 Encryption"
+	},
+	"allowedValues": [
+		"None",
+		"DES",
+		"DES3",
+		"AES128",
+		"AES192",
+		"AES256",
+		"GCMAES128",
+		"GCMAES192",
+		"GCMAES256"
+	]
+},
+"phase1DhGroup": {
+	"type": "string",
+	"metadata": {
+		"description": "Phase 1 DH Group"
+	},
+	"allowedValues": [
+		"None",
+		"DHGroup1",
+		"DHGroup2",
+		"DHGroup14",
+		"DHGroup2048",
+		"ECP256",
+		"ECP384",
+		"DHGroup24"
+	]
+},
+"phase2Integrity": {
+	"type": "string",
+	"metadata": {
+		"description": "Phase 2 Integrity"
+	},
+	"allowedValues": [
+		"MD5",
+		"SHA1",
+		"SHA256",
+		"SHA384",
+		"GCMAES256",
+		"GCMAES128"
+	]
+},
+"phase2Encryption": {
+	"type": "string",
+	"metadata": {
+		"description": "Phase 2 Encryption"
+	},
+	"allowedValues": [
+		"DES",
+		"DES3",
+		"AES128",
+		"AES192",
+		"AES256",
+		"GCMAES256",
+		"GCMAES128"
+	]
+},
+"phase2PfsGroup": {
+	"type": "string",
+	"metadata": {
+		"description": "Phase 2 PFS Group"
+	},
+	"allowedValues": [
+		"None",
+		"PFS1",
+		"PFS2",
+		"PFS2048",
+		"ECP256",
+		"ECP384",
+		"PFS24",
+		"PFS14",
+		"PFSMM"
+	]
+},
+"phase2LifeTimeSeconds": {
+	"type": "integer",
+	"metadata": {
+		"description": "Phase 2 Lifetime in Seconds"
+	},
+	"defaultValue": 27000
+},
+"phase2LifeTimeKB": {
+	"type": "integer",
+	"metadata": {
+		"description": "Phase 2 Lifetime in KB"
+	},
+	"defaultValue": 102400000
+},
+"isPolicyBasedVPN": {
+	"type": "boolean",
+	"defaultValue": false,
+	"metadata": {
+		"description": "If the VPN will be a Policy Based connection."
+	}
+},
+"bgpPeerIp": {
+	"type": "string",
+	"metadata": {
+		"description": "Remote BGP Peer IP.  If not using BGP leave blank.  BGP is not an Option on Policy VPNs"
+	}
+},
+"bgpAsn": {
+	"type": "string",
+	"metadata": {
+		"description": "Remote BGP ASN.  If not using BGP leave blank.  BGP is not an Option on Policy VPNs"
+	}
+},
+"azureGatewayName": {
+	"type": "string",
+	"metadata": {
+		"description": "Name of Azure VPN Gateway."
+	}
+},
+"azureGatewayResourceGroupName": {
+	"type": "string",
+	"metadata": {
+		"description": "Name of Azure VPN Gateway Resource Group."
+	}
+},
+"location": {
+	"type": "string",
+	"metadata": {
+		"description": "Azure Region for Azure VPN Gateway"
+	}
+}        
+```
 
 # What are some Features that are planned in the future?
 
