@@ -824,7 +824,7 @@
                 "mode": "All",
                 "policyType": "Custom",
                 "displayName": "Deploy-SitetoSite-VPN",
-                "description": "Deploy A Site to Site VPN Connection.  Assing Policy to Resource Group that has you VPN Gateway that will be terminating the VPN Connection",
+                "description": "Deploy A Site to Site VPN Connection.  Assiging Policy to the Subscription that has you VPN Gateway that will be terminating the VPN Connection",
                 "metadata": {
                     "category": "Enterprise Landing Zone"
                 },
