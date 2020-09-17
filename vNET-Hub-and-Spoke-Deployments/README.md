@@ -27,6 +27,15 @@ New-AzManagementGroupDeployment -Name Hub-and-Spoke -ManagementGroupId $manageme
 -TemplateParameterUri https://raw.githubusercontent.com/lukearp/Enterprise-Landing-Zone-Policies/master/vNET-Hub-and-Spoke-Deployments/ARM-Deploy-Templates/Policy-Definition-Deploy/ARM-ManagementGroup-DeployPolicyDefs-vNET-Hub-and-Spoke-Parameters.json
 ```
 
+If deploying to Azure Gov
+```
+$managementGroupId = "ID"
+$location = "usgovvirginia"
+New-AzManagementGroupDeployment -Name Hub-and-Spoke -ManagementGroupId $managementGroupId -Location $location `
+-TemplateUri https://raw.githubusercontent.com/lukearp/Enterprise-Landing-Zone-Policies/master/vNET-Hub-and-Spoke-Deployments/ARM-Deploy-Templates/Policy-Definition-Deploy/ARM-ManagementGroup-DeployPolicyDefs-vNET-Hub-and-Spoke.json `
+-TemplateParameterUri https://raw.githubusercontent.com/lukearp/Enterprise-Landing-Zone-Policies/master/vNET-Hub-and-Spoke-Deployments/ARM-Deploy-Templates/Policy-Definition-Deploy/GOV-ARM-ManagementGroup-DeployPolicyDefs-vNET-Hub-and-Spoke-Parameters.json
+```
+
 # How to support multiple subscription deployments?
 
 The Rememdiation task has to have rights to the HUB VNET.  When a Policy is assigned there is a Remediation Principal ID.  This is an Object ID of a Service principal.  This Object ID needs to be given rights to the Resource Group that has your HUB VNET.  This can easily be done using Cloud Shell:
