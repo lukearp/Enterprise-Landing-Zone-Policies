@@ -1121,10 +1121,10 @@
                                             "ipsecPolicy": {
                                                 "saLifeTimeSeconds": "[parameters('phase2LifeTimeSeconds')]",
                                                 "saDataSizeKilobytes": "[parameters('phase2LifeTimeKB')]",
-                                                "ipsecEncryption": "[parameters('phase1Encryption')]",
-                                                "ipsecIntegrity": "[parameters('phase1Integrity')]",
-                                                "ikeEncryption": "[parameters('phase2Encryption')]",
-                                                "ikeIntegrity": "[parameters('phase2Integrity')]",
+                                                "ipsecEncryption": "[parameters('phase2Encryption')]",
+                                                "ipsecIntegrity": "[parameters('phase2Integrity')]",
+                                                "ikeEncryption": "[parameters('phase1Encryption')]",
+                                                "ikeIntegrity": "[parameters('phase1Integrity')]",
                                                 "dhGroup": "[parameters('phase1DhGroup')]",
                                                 "pfsGroup": "[parameters('phase2PfsGroup')]"
                                             }
