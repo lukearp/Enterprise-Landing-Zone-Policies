@@ -2,11 +2,11 @@
 
 # What do these Policies do?
 
-The two Policies in this folder are focused on deploying a [Hub and Spoke Azure VNET architecture](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/hub-spoke-network-topology#:~:text=Hub%20and%20spoke%20network%20topology%201%20Overview.%20As,complex%20multitier%20workloads%20in%20a%20single%20spoke.%20). 
+The three Policies in this folder are focused on deploying a [Hub and Spoke Azure VNET architecture](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/hub-spoke-network-topology#:~:text=Hub%20and%20spoke%20network%20topology%201%20Overview.%20As,complex%20multitier%20workloads%20in%20a%20single%20spoke.%20). 
 
 The Deploy-vNet-Hub will deploy a Hub Virtual Network with an Azure VPN Gateway.  You also have the option to define subnet space for an Azure Firewall and Bastion host.  If you add the address space, the appliances will be deployed into the Resource Group.  
 
-The Deploy-vNet-Spoke will deploy a Virtual Network and then peer to a Hub Virtual Network with Gateway Transit configured.  
+The Deploy-vNet-Spoke will deploy a Virtual Network and then peer to a Hub Virtual Network with Gateway Transit configured.  It will also deploy a Bastion host if you add the address space for the bastionAddressPrefix parameter.  
 
 All Subnets defined in the policy will have Network Security Groups created, except for special subnets used for Gateways, Firewalls, and Bastion Hosts.
 
@@ -73,19 +73,19 @@ JSON from Template:
 "vnetName": {
 	"type": "String",
 	"metadata": {
-		"description": "The VNET name of your Spoke"
+		"description": "The VNET name of your Hub"
 	}
 },
 "resourceGroupName": {
 	"type": "String",
 	"metadata": {
-		"description": "The Resource Group Name that the Spoke VNET will be deployed to."
+		"description": "The Resource Group Name that the Hub VNET will be deployed to."
 	}
 },
 "vnetAddressSpace": {
 	"type": "String",
 	"metadata": {
-		"description": "The IPv4 Address Space for the Spoke VNET. Ex: \"10.10.0.0/22\""
+		"description": "The IPv4 Address Space for the Hub VNET. Ex: \"10.10.0.0/22\""
 	}
 },
 "dnsServers": {
@@ -100,6 +100,20 @@ JSON from Template:
 	"metadata": {
 		"description": "Subnet address space for the VPN/Express Route Gateway. Ex: \"10.0.3.224/27\""
 	}
+},
+"firewallSubnetAddressPrefix": {
+	"type": "string",
+	"metadata": {
+		"description": "Leave Empty if you don't want to deploy. Subnet address space for an Azure Firewall. Ex: \"10.0.3.0/25\""
+	},
+	"defaultValue": ""
+},
+"bastionSubnetAddressPrefix": {
+	"type": "string",
+	"metadata": {
+		"description": "Leave Empty if you don't want to deploy. Subnet address space for an Azure Bastion Host. Ex: \"10.0.3.192/27\""
+	},
+	"defaultValue": ""
 },
 "subnets": {
 	"type": "Array",
@@ -122,9 +136,17 @@ JSON from Template:
 "gatewaySku": {
 	"type": "String",
 	"allowedValues": [
-		"Basic", "HighPerformance", "Standard", "UltraPerformance", "VpnGw1", "VpnGw2", "VpnGw3", "VpnGw4", "VpnGw5"
+		"Basic",
+		"HighPerformance",
+		"Standard",
+		"UltraPerformance",
+		"VpnGw1",
+		"VpnGw2",
+		"VpnGw3",
+		"VpnGw4",
+		"VpnGw5"
 	],
-	"defaultValue": "Basic",
+	"defaultValue": "Standard",
 	"metadata": {
 		"description": "Azure Gateway Sku. Currently, this template does not support Availability Zone Gateway SKUs"
 	}
@@ -146,6 +168,7 @@ Parameters Required
 |resourceGroupName|The Resource Group Name that the Spoke VNET will be deployed to.|
 |vnetAddressSpace|The IPv4 Address Space for the Spoke VNET. Ex: \"10.10.0.0/22\"|
 |dnsServers| Arrary of DNS Service IPs if wanting to use Custom DNS.  Ex: [\"10.10.1.1\",\"10.10.1.2\"]|
+|bastionSubnetAddressPrefix|Leave Empty if you don't want to deploy. Subnet address space for an Azure Bastion Host. Ex: \"10.0.3.192/27\"|
 |subnets|Names and address spaces of your Subnets.  Objects need a Name and Address Preffix property Ex: [{\"name\": \"subnet1\",\"addressPrefix\":\"10.10.0.0/24\"},{\"name\": \"subnet2\",\"addressPrefix\":\"10.10.1.0/24\"}]|
 |hubVnetId|Resource ID of the HUB VNET that the Spoke will be peered to. Ex: /subscriptions/<subId>/resourceGroups/Policy-Tset/providers/Microsoft.Network/virtualNetworks/<vnet name>|
 |location|Azure Region that VNET will be deployed to. Ex: eastus|
@@ -169,6 +192,13 @@ JSON from Template:
 	"metadata": {
 		"description": "The IPv4 Address Space for the Spoke VNET. Ex: \"10.10.0.0/22\""
 	}
+},
+"bastionSubnetAddressPrefix": {
+	"type": "string",
+	"metadata": {
+		"description": "Leave Empty if you don't want to deploy. Subnet address space for an Azure Bastion Host. Ex: \"10.0.3.192/27\""
+	},
+	"defaultValue": ""
 },
 "dnsServers": {
 	"type": "Array",

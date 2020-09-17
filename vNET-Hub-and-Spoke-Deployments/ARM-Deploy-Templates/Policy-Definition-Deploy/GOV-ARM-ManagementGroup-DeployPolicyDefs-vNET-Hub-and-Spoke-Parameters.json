@@ -439,19 +439,19 @@
                     "vnetName": {
                         "type": "String",
                         "metadata": {
-                            "description": "The VNET name of your Spoke"
+                            "description": "The VNET name of your Hub"
                         }
                     },
                     "resourceGroupName": {
                         "type": "String",
                         "metadata": {
-                            "description": "The Resource Group Name that the Spoke VNET will be deployed to."
+                            "description": "The Resource Group Name that the Hub VNET will be deployed to."
                         }
                     },
                     "vnetAddressSpace": {
                         "type": "String",
                         "metadata": {
-                            "description": "The IPv4 Address Space for the Spoke VNET. Ex: \"10.10.0.0/22\""
+                            "description": "The IPv4 Address Space for the Hub VNET. Ex: \"10.10.0.0/22\""
                         }
                     },
                     "dnsServers": {
@@ -568,6 +568,9 @@
                                         "dnsServers": {
                                             "value": "[parameters('dnsServers')]"
                                         },
+                                        "bastionSubnetAddressPrefix": {
+                                            "value": "[parameters('bastionSubnetAddressPrefix')]"
+                                        },
                                         "subnets": {
                                             "value": "[parameters('subnets')]"
                                         },
@@ -593,6 +596,9 @@
                                             },
                                             "dnsServers": {
                                                 "type": "array"
+                                            },
+                                            "bastionSubnetAddressPrefix": {
+                                                "type": "string"
                                             },
                                             "subnets": {
                                                 "type": "array"
@@ -622,6 +628,13 @@
                                                     }
                                                 ]
                                             },
+                                            "Bastion": {
+                                                "name": "AzureBastionSubnet",
+                                                "properties": {
+                                                    "addressPrefix": "[parameters('bastionSubnetAddressPrefix')]"
+                                                }
+                                            },
+                                            "finalSubnetArray": "[if(not(empty(parameters('bastionSubnetAddressPrefix'))),concat(variables('subnets').subnetArray,array(variables('Bastion'))),variables('subnets').subnetArray)]",
                                             "subscriptionId": "[subscription().id]"
                                         },
                                         "resources": [
@@ -674,6 +687,61 @@
                                             {
                                                 "type": "Microsoft.Resources/deployments",
                                                 "apiVersion": "2018-05-01",
+                                                "name": "[concat(parameters('vnetName'),'-',parameters('location'),'-Bastion')]",
+                                                "condition": "[not(empty(parameters('bastionSubnetAddressPrefix')))]",
+                                                "resourceGroup": "[parameters('resourceGroupName')]",
+                                                "dependsOn": [
+                                                    "[concat(parameters('vnetName'),'-',parameters('location'))]"
+                                                ],
+                                                "properties": {
+                                                    "mode": "incremental",
+                                                    "template": {
+                                                        "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                                                        "contentVersion": "1.0.0.0",
+                                                        "parameters": {},
+                                                        "variables": {},
+                                                        "resources": [
+                                                            {
+                                                                "name": "[concat(parameters('location'),'-bastion-pip')]",
+                                                                "type": "Microsoft.Network/publicIPAddresses",
+                                                                "apiVersion": "2020-05-01",
+                                                                "location": "[parameters('location')]",
+                                                                "sku": {
+                                                                    "name": "standard"
+                                                                },
+                                                                "properties": {
+                                                                    "publicIPAllocationMethod": "Static"
+                                                                }
+                                                            },
+                                                            {
+                                                                "name": "[concat('bastion-', parameters('location'))]",
+                                                                "type": "Microsoft.Network/bastionHosts",
+                                                                "apiVersion": "2020-05-01",
+                                                                "location": "[parameters('location')]",
+                                                                "tags": {},
+                                                                "properties": {
+                                                                    "ipConfigurations": [
+                                                                        {
+                                                                            "properties": {
+                                                                                "subnet": {
+                                                                                    "id": "[concat(variables('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Network/virtualNetworks/',parameters('vnetName'),'/subnets/AzureBastionSubnet')]"
+                                                                                },
+                                                                                "publicIPAddress": {
+                                                                                    "id": "[concat(variables('subscriptionId'),'/resourceGroups/',parameters('resourceGroupName'),'/providers/Microsoft.Network/publicIPAddresses/',concat(parameters('location'),'-bastion-pip'))]"
+                                                                                }
+                                                                            },
+                                                                            "name": "ipconfig"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "Microsoft.Resources/deployments",
+                                                "apiVersion": "2018-05-01",
                                                 "name": "[concat(parameters('vnetName'),'-',parameters('location'))]",
                                                 "resourceGroup": "[parameters('resourceGroupName')]",
                                                 "dependsOn": [
@@ -701,7 +769,7 @@
                                                                     "dhcpOptions": {
                                                                         "dnsServers": "[parameters('dnsServers')]"
                                                                     },
-                                                                    "subnets": "[variables('subnets').subnetArray]"
+                                                                    "subnets": "[variables('finalSubnetArray')]"
                                                                 }
                                                             },
                                                             {
@@ -789,6 +857,13 @@
                         "metadata": {
                             "description": "The IPv4 Address Space for the Spoke VNET. Ex: \"10.10.0.0/22\""
                         }
+                    },
+                    "bastionSubnetAddressPrefix": {
+                        "type": "string",
+                        "metadata": {
+                            "description": "Leave Empty if you don't want to deploy. Subnet address space for an Azure Bastion Host. Ex: \"10.0.3.192/27\""
+                        },
+                        "defaultValue": ""
                     },
                     "dnsServers": {
                         "type": "Array",
