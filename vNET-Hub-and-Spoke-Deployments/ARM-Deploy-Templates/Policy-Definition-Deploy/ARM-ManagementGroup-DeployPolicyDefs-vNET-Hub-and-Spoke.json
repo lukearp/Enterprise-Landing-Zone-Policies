@@ -10,6 +10,9 @@
         },
         "input3": {
             "type": "object"
+        },
+        "input4": {
+            "type": "object"
         }
     },
     "variables": {
@@ -32,6 +35,12 @@
             "type": "Microsoft.Authorization/policyDefinitions",
             "apiVersion": "2019-09-01",
             "properties": "[parameters('input3')]"
+        },
+        {
+            "name": "Deploy-vNET-Hub-NoGW",
+            "type": "Microsoft.Authorization/policyDefinitions",
+            "apiVersion": "2019-09-01",
+            "properties": "[parameters('input4')]"
         }
     ]
 }
